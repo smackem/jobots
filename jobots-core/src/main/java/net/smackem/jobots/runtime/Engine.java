@@ -1,30 +1,45 @@
 package net.smackem.jobots.runtime;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Engine {
+    private static final Logger log = LoggerFactory.getLogger(Engine.class);
     private final Vector boardDimensions;
     private final Collection<Robot> robots;
 
     public Engine(Vector boardDimensions, Collection<Robot> robots) {
         this.boardDimensions = Objects.requireNonNull(boardDimensions);
-        this.robots = new ArrayList<>(Objects.requireNonNull(robots));
+        this.robots = List.copyOf(Objects.requireNonNull(robots));
+    }
+
+    public Vector boardDimensions() {
+        return this.boardDimensions;
+    }
+
+    public Collection<Robot> robots() {
+        return this.robots;
     }
 
     public void tick() {
         for (final Robot robot : this.robots) {
-            final RobotController.Output output = robot.controller().pollOutput();
+            final RobotLogic.Output output = robot.logic().pollOutput();
             if (output != null) {
-                robot.setSpeed(output.speed());
+                Vector speed = output.speed();
+                speed = speed.length() > 10
+                        ? speed.normalize().multiplyWith(10)
+                        : speed;
+                log.info("new speed: {}", speed);
+                robot.setSpeed(speed);
             }
         }
 
         for (final Robot robot : this.robots) {
             final Vector actualSpeed = robot.getActualSpeed();
-            robot.setPosition(Vector.add(robot.getPosition(), robot.getActualSpeed()));
+            robot.setPosition(robot.getPosition().add(actualSpeed));
             final Vector speed = robot.getSpeed();
             if (speed.equals(actualSpeed)) {
                 continue;
@@ -44,7 +59,7 @@ public class Engine {
         }
 
         for (final Robot robot : this.robots) {
-            robot.controller().offerInput(new RobotController.Input(
+            robot.logic().offerInput(new RobotLogic.Input(
                     robot.getPosition(),
                     this.boardDimensions,
                     this.robots.stream()

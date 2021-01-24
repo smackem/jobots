@@ -4,23 +4,23 @@ import java.util.Objects;
 
 public class Robot {
 
-    private final RobotController controller;
+    private final RobotLogic logic;
     private final double acceleration;
     private Vector position = Vector.ORIGIN;
     private Vector speed = Vector.ORIGIN;
     private Vector actualSpeed = Vector.ORIGIN;
 
-    public Robot(double acceleration, RobotController controller) {
+    public Robot(double acceleration, RobotLogic logic) {
         this.acceleration = acceleration;
-        this.controller = Objects.requireNonNull(controller);
+        this.logic = Objects.requireNonNull(logic);
     }
 
     public double acceleration() {
         return this.acceleration;
     }
 
-    public RobotController controller() {
-        return this.controller;
+    public RobotLogic logic() {
+        return this.logic;
     }
 
     public Vector getPosition() {

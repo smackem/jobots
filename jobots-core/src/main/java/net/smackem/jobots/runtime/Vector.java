@@ -29,20 +29,24 @@ public class Vector {
         return new Vector(-this.x, -this.y);
     }
 
-    public static Vector add(Vector a, Vector b) {
-        return new Vector(a.x + b.x, a.y + b.y);
+    public Vector add(Vector right) {
+        return new Vector(this.x + right.x, this.y + right.y);
     }
 
-    public static Vector subtract(Vector a, Vector b) {
-        return new Vector(a.x - b.x, a.y - b.y);
+    public Vector subtract(Vector right) {
+        return new Vector(this.x - right.x, this.y - right.y);
     }
 
-    public static Vector multiply(Vector v, double scalar) {
-        return new Vector(v.x * scalar, v.y * scalar);
+    public Vector multiplyWith(double scalar) {
+        return new Vector(this.x * scalar, this.y * scalar);
     }
 
-    public static Vector divide(Vector v, double scalar) {
-        return new Vector(v.x / scalar, v.y / scalar);
+    public Vector divideBy(double scalar) {
+        return new Vector(this.x / scalar, this.y / scalar);
+    }
+
+    public static double distance(Vector a, Vector b) {
+        return Math.hypot(a.x() - b.x(), a.y() - b.y());
     }
 
     public Vector normalize() {

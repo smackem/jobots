@@ -5,8 +5,6 @@ import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 import org.junit.Test;
 
-import javax.script.ScriptException;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +23,7 @@ public class RobotTest {
                 .allowHostClassLookup(className -> className.startsWith("net.smackem.jobots"))
                 .build();
         final Value bindings = context.getBindings(js);
-        bindings.putMember("input", new RobotController.Input(
+        bindings.putMember("input", new RobotLogic.Input(
                 new Vector(100, 200),
                 new Vector(1000, 800),
                 List.of(new Vector(20, 10), new Vector(400, 30))));
