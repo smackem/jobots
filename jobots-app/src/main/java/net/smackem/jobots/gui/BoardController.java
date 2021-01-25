@@ -3,12 +3,13 @@ package net.smackem.jobots.gui;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import net.smackem.jobots.runtime.*;
 
@@ -54,6 +55,20 @@ public class BoardController {
     private void initialize() {
         render();
         this.timer.play();
+        Platform.runLater(() ->
+                this.canvas.getScene().getWindow().setOnCloseRequest(this::onWindowClosing));
+    }
+
+    private void onWindowClosing(WindowEvent windowEvent) {
+        for (final Robot robot : this.engine.robots()) {
+            if (robot.logic() instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) robot.logic()).close();
+                } catch (Exception ignored) {
+                    // do nothing
+                }
+            }
+        }
     }
 
     private void render() {

@@ -17,6 +17,7 @@ public class JSRobotLogic implements RobotLogic, AutoCloseable {
     private final String source;
     private final Thread thread;
     private final LogicBus bus;
+    private volatile boolean acceptingInput;
 
     public JSRobotLogic(String source, String sourceName) {
         this.source = source;
@@ -35,13 +36,20 @@ public class JSRobotLogic implements RobotLogic, AutoCloseable {
         bindings.putMember("Output", Value.asValue(RobotLogic.Output.class));
         bindings.putMember("Vector", Value.asValue(Vector.class));
         try (context) {
-            final Value result = context.eval(lang, this.source);
+            final Value func = context.parse(lang, this.source);
+            this.acceptingInput = true;
+            final Value result = func.execute();
             log.info("JS returned {}", result);
+        } catch (Exception e) {
+            log.info("JS execution broke with exception", e);
         }
     }
 
     @Override
     public void offerInput(Input input) {
+        if (this.acceptingInput == false) {
+            return;
+        }
         if (this.bus.inputQueue.offer(input) == false) {
             log.warn("offering input to {} failed, queue is full", this.thread.getName());
         }
