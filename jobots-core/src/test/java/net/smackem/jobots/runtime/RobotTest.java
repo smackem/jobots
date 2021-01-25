@@ -11,11 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class RobotTest {
     @Test
-    public void testIt() {
-        assertThat(Integer.valueOf(1)).isNotNull();
-    }
-
-    @Test
     public void runScript() {
         final String js = "js";
         final Context context = Context.newBuilder(js)
@@ -27,11 +22,11 @@ public class RobotTest {
                 new Vector(100, 200),
                 new Vector(1000, 800),
                 List.of(new Vector(20, 10), new Vector(400, 30))));
+        bindings.putMember("Output", Value.asValue(RobotLogic.Output.class));
+        bindings.putMember("Vector", Value.asValue(Vector.class));
         try (context) {
             final Value result = context.eval(js, """
                     var locations = input.neighbours();
-                    var Output = Java.type('net.smackem.jobots.runtime.RobotController.Output');
-                    var Vector = Java.type('net.smackem.jobots.runtime.Vector');
                     var x = [];
                     for (let location of locations) {
                         print(location);

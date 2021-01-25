@@ -6,13 +6,15 @@ public class Robot {
 
     private final RobotLogic logic;
     private final double acceleration;
+    private final int colorArgb;
     private Vector position = Vector.ORIGIN;
     private Vector speed = Vector.ORIGIN;
     private Vector actualSpeed = Vector.ORIGIN;
 
-    public Robot(double acceleration, RobotLogic logic) {
+    public Robot(double acceleration, RobotLogic logic, int colorArgb) {
         this.acceleration = acceleration;
         this.logic = Objects.requireNonNull(logic);
+        this.colorArgb = colorArgb;
     }
 
     public double acceleration() {
@@ -21,6 +23,10 @@ public class Robot {
 
     public RobotLogic logic() {
         return this.logic;
+    }
+
+    public int colorArgb() {
+        return this.colorArgb;
     }
 
     public Vector getPosition() {

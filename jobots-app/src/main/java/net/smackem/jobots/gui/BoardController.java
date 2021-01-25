@@ -8,22 +8,43 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 import net.smackem.jobots.runtime.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class BoardController {
 
+    private static final int BOARD_WIDTH = 800, BOARD_HEIGHT = 600;
     private final Timeline timer;
     private final Engine engine;
 
     public BoardController() {
         this.timer = new Timeline(new KeyFrame(Duration.millis(50), this::tick));
         this.timer.setCycleCount(Animation.INDEFINITE);
-        this.engine = new Engine(new Vector(800, 600), List.of(
-                new Robot(1.0, new RandomRobotLogic())
-        ));
+        final Collection<Robot> robots = createRandomRobots(3);
+        final String source = readSourceFromResource("/net/smackem/jobots/runtime/flock.js");
+        robots.add(new Robot(1.0, new JSRobotLogic(source, "flock"), colorToArgb(Color.RED)));
+        this.engine = new Engine(new Vector(BOARD_WIDTH, BOARD_HEIGHT), robots);
+    }
+
+    private String readSourceFromResource(String resource) {
+        final InputStream is = getClass().getResourceAsStream(resource);
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            return reader.lines().collect(Collectors.joining());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @FXML
@@ -42,7 +63,7 @@ public class BoardController {
         gc.fillRect(0, 0, dimensions.x(), dimensions.y());
         for (final Robot robot : this.engine.robots()) {
             final Vector position = robot.getPosition();
-            gc.setFill(Color.PINK);
+            gc.setFill(argbToColor(robot.colorArgb()));
             gc.fillOval(position.x() - 5, position.y() - 5, 10, 10);
         }
     }
@@ -50,5 +71,44 @@ public class BoardController {
     private void tick(ActionEvent ignored) {
         this.engine.tick();
         render();
+    }
+
+    private static Collection<Robot> createRandomRobots(int count) {
+        final List<Color> robotPaints = List.of(
+                Color.AQUAMARINE,
+                Color.ORANGE,
+                Color.YELLOW,
+                Color.YELLOWGREEN,
+                Color.BLUE,
+                Color.BLUEVIOLET,
+                Color.PINK,
+                Color.GREEN,
+                Color.DARKSEAGREEN,
+                Color.CYAN,
+                Color.CHOCOLATE);
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        return IntStream.range(0, count)
+                .mapToObj(ignored -> {
+                    final Color color = robotPaints.get(random.nextInt(0, robotPaints.size()));
+                    final Robot r = new Robot(0.6, new RandomRobotLogic(), colorToArgb(color));
+                    r.setPosition(new Vector(random.nextInt(BOARD_WIDTH), random.nextDouble(BOARD_HEIGHT)));
+                    return r;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private static int colorToArgb(Color color) {
+        return ((int) (color.getOpacity() * 255) << 24) |
+                ((int) (color.getRed() * 255) << 16) |
+                ((int) (color.getGreen() * 255) << 8) |
+                ((int) (color.getBlue() * 255));
+    }
+
+    private static Color argbToColor(int colorArgb) {
+        return Color.rgb(
+                colorArgb >> 16 & 255,
+                colorArgb >> 8 & 255,
+                colorArgb & 255,
+                (colorArgb >> 24 & 255) / 255.0);
     }
 }

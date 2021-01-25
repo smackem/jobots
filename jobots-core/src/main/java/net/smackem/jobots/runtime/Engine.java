@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class Engine {
     private static final Logger log = LoggerFactory.getLogger(Engine.class);
+    private static final double MAX_ROBOT_SPEED = 6;
     private final Vector boardDimensions;
     private final Collection<Robot> robots;
 
@@ -29,10 +30,9 @@ public class Engine {
             final RobotLogic.Output output = robot.logic().pollOutput();
             if (output != null) {
                 Vector speed = output.speed();
-                speed = speed.length() > 10
-                        ? speed.normalize().multiplyWith(10)
+                speed = speed.length() > MAX_ROBOT_SPEED
+                        ? speed.normalize().multiplyWith(MAX_ROBOT_SPEED)
                         : speed;
-                log.info("new speed: {}", speed);
                 robot.setSpeed(speed);
             }
         }

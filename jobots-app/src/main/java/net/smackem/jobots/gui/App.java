@@ -13,7 +13,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final Scene scene = new Scene(loadFXML("board"), 800, 600);
+        final Scene scene = new Scene(loadFXML("board"), 850, 650);
         stage.setScene(scene);
         stage.setTitle("jobots");
         stage.show();
