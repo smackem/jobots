@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import net.smackem.jobots.runtime.*;
@@ -34,8 +35,23 @@ public class BoardController {
         this.timer.setCycleCount(Animation.INDEFINITE);
         final Collection<Robot> robots = createRandomRobots(3);
         final String source = readSourceFromResource("/net/smackem/jobots/runtime/flock.js");
-        robots.add(new Robot(1.0, new JSRobotLogic(source, "flock"), colorToArgb(Color.RED)));
+        robots.add(new Robot(1.0, new JSRobotLogic(source, "flock1"), colorToArgb(Color.RED)));
+        robots.add(new Robot(0.1, new JSRobotLogic(source, "flock2"), colorToArgb(Color.RED)));
+        robots.add(new Robot(0.01, new JSRobotLogic(source, "flock3"), colorToArgb(Color.RED)));
         this.engine = new Engine(new Vector(BOARD_WIDTH, BOARD_HEIGHT), robots);
+    }
+
+    @FXML
+    private Canvas canvas;
+
+    @FXML
+    private void initialize() {
+        render();
+        this.timer.play();
+        Platform.runLater(() -> {
+            final Window window = this.canvas.getScene().getWindow();
+            window.setOnCloseRequest(this::onWindowClosing);
+        });
     }
 
     private String readSourceFromResource(String resource) {
@@ -46,17 +62,6 @@ public class BoardController {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @FXML
-    private Canvas canvas;
-
-    @FXML
-    private void initialize() {
-        render();
-        this.timer.play();
-        Platform.runLater(() ->
-                this.canvas.getScene().getWindow().setOnCloseRequest(this::onWindowClosing));
     }
 
     private void onWindowClosing(WindowEvent windowEvent) {
