@@ -31,10 +31,13 @@ public class JSRobotLogic implements RobotLogic, AutoCloseable {
                 .allowHostAccess(HostAccess.ALL)
                 .allowHostClassLookup(className -> className.startsWith("net.smackem.jobots"))
                 .build();
+        final Value outputType = context.eval(lang, "Java.type('%s')".formatted(RobotLogic.Output.class.getName()));
+        final Value vectorType = context.eval(lang, "Java.type('%s')".formatted(Vector.class.getName()));
         final Value bindings = context.getBindings(lang);
         bindings.putMember("bus", this.bus);
-        bindings.putMember("Output", Value.asValue(RobotLogic.Output.class));
-        bindings.putMember("Vector", Value.asValue(Vector.class));
+        bindings.putMember("Output", outputType);
+        bindings.putMember("Vector", vectorType);
+        bindings.putMember("log", log);
         try (context) {
             final Value func = context.parse(lang, this.source);
             this.acceptingInput = true;
@@ -75,12 +78,12 @@ public class JSRobotLogic implements RobotLogic, AutoCloseable {
         private final BlockingQueue<Output> outputQueue = new ArrayBlockingQueue<>(1);
 
         public Input poll() throws InterruptedException {
-            log.info("poll input queue (len={})", this.inputQueue.size());
+            log.debug("poll input queue (len={})", this.inputQueue.size());
             return this.inputQueue.poll(1, TimeUnit.MINUTES);
         }
 
         public void offer(Output output) throws InterruptedException {
-            log.info("offer to output queue (len={})", this.outputQueue.size());
+            log.debug("offer to output queue (len={})", this.outputQueue.size());
             this.outputQueue.offer(output, 1, TimeUnit.SECONDS);
         }
     }

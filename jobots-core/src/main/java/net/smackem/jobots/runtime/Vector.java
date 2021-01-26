@@ -2,6 +2,7 @@ package net.smackem.jobots.runtime;
 
 import java.util.Objects;
 
+
 public class Vector {
     private final double x;
     private final double y;
@@ -47,6 +48,11 @@ public class Vector {
 
     public static double distance(Vector a, Vector b) {
         return Math.hypot(a.x() - b.x(), a.y() - b.y());
+    }
+
+    public static double angleBetween(Vector a, Vector b) {
+        // via "perpendicular dot product"
+        return Math.atan2(a.x * b.y - a.y * b.x, a.x * b.x + a.y * b.y);
     }
 
     public Vector normalize() {

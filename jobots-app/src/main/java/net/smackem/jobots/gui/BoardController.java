@@ -33,11 +33,12 @@ public class BoardController {
     public BoardController() {
         this.timer = new Timeline(new KeyFrame(Duration.millis(50), this::tick));
         this.timer.setCycleCount(Animation.INDEFINITE);
-        final Collection<Robot> robots = createRandomRobots(3);
+        final Collection<Robot> robots = createRandomRobots(1);
         final String source = readSourceFromResource("/net/smackem/jobots/runtime/flock.js");
-        robots.add(new Robot(1.0, new JSRobotLogic(source, "flock1"), colorToArgb(Color.RED)));
-        robots.add(new Robot(0.1, new JSRobotLogic(source, "flock2"), colorToArgb(Color.RED)));
-        robots.add(new Robot(0.01, new JSRobotLogic(source, "flock3"), colorToArgb(Color.RED)));
+        robots.add(new Robot(3, new JSRobotLogic(source, "flock1"), colorToArgb(Color.RED)));
+        //robots.add(new Robot(3, new JSRobotLogic(source, "flock2"), colorToArgb(Color.RED)));
+        //robots.add(new Robot(3, new JSRobotLogic(source, "flock3"), colorToArgb(Color.RED)));
+        positionRobots(robots);
         this.engine = new Engine(new Vector(BOARD_WIDTH, BOARD_HEIGHT), robots);
     }
 
@@ -110,11 +111,16 @@ public class BoardController {
         return IntStream.range(0, count)
                 .mapToObj(ignored -> {
                     final Color color = robotPaints.get(random.nextInt(0, robotPaints.size()));
-                    final Robot r = new Robot(0.6, new RandomRobotLogic(), colorToArgb(color));
-                    r.setPosition(new Vector(random.nextInt(BOARD_WIDTH), random.nextDouble(BOARD_HEIGHT)));
-                    return r;
+                    return new Robot(0.6, new RandomRobotLogic(), colorToArgb(color));
                 })
                 .collect(Collectors.toList());
+    }
+
+    private static void positionRobots(Collection<Robot> robots) {
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        for (final Robot r : robots) {
+            r.setPosition(new Vector(random.nextInt(BOARD_WIDTH), random.nextDouble(BOARD_HEIGHT)));
+        }
     }
 
     private static int colorToArgb(Color color) {
