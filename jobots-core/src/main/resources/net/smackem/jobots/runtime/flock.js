@@ -1,4 +1,4 @@
-const prefDistance = 30;
+const prefDistance = 120;
 
 function vectorStr(v) {
     return v.x() + ";" + v.y();
@@ -33,8 +33,8 @@ while (input = bus.poll()) {
                 .multiplyWith(prefDistance - nearest.distance);
         }
     }
-    log.debug("speed = {}", vectorStr(speed));
     if (speed != null) {
+        log.debug("speed = {}", vectorStr(speed));
         bus.offer(new Output(speed));
     }
 }

@@ -33,11 +33,11 @@ public class BoardController {
     public BoardController() {
         this.timer = new Timeline(new KeyFrame(Duration.millis(50), this::tick));
         this.timer.setCycleCount(Animation.INDEFINITE);
-        final Collection<Robot> robots = createRandomRobots(1);
+        final Collection<Robot> robots = createRandomRobots(10);
         final String source = readSourceFromResource("/net/smackem/jobots/runtime/flock.js");
-        robots.add(new Robot(3, new JSRobotLogic(source, "flock1"), colorToArgb(Color.RED)));
-        //robots.add(new Robot(3, new JSRobotLogic(source, "flock2"), colorToArgb(Color.RED)));
-        //robots.add(new Robot(3, new JSRobotLogic(source, "flock3"), colorToArgb(Color.RED)));
+        for (int i = 0; i < 50; i++) {
+            robots.add(new Robot(new ThreadedJSRobotLogic(source, "flock" + i), colorToArgb(Color.RED)));
+        }
         positionRobots(robots);
         this.engine = new Engine(new Vector(BOARD_WIDTH, BOARD_HEIGHT), robots);
     }
@@ -66,15 +66,7 @@ public class BoardController {
     }
 
     private void onWindowClosing(WindowEvent windowEvent) {
-        for (final Robot robot : this.engine.robots()) {
-            if (robot.logic() instanceof AutoCloseable) {
-                try {
-                    ((AutoCloseable) robot.logic()).close();
-                } catch (Exception ignored) {
-                    // do nothing
-                }
-            }
-        }
+        this.engine.close();
     }
 
     private void render() {
@@ -111,7 +103,7 @@ public class BoardController {
         return IntStream.range(0, count)
                 .mapToObj(ignored -> {
                     final Color color = robotPaints.get(random.nextInt(0, robotPaints.size()));
-                    return new Robot(0.6, new RandomRobotLogic(), colorToArgb(color));
+                    return new Robot(new RandomRobotLogic(), colorToArgb(color));
                 })
                 .collect(Collectors.toList());
     }

@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Engine {
+public class Engine implements AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(Engine.class);
-    private static final double MAX_ROBOT_SPEED = 6;
+    private static final double MAX_ROBOT_SPEED = 300;
     private final Vector boardDimensions;
     private final Collection<Robot> robots;
 
@@ -29,11 +29,7 @@ public class Engine {
         for (final Robot robot : this.robots) {
             final RobotLogic.Output output = robot.logic().pollOutput();
             if (output != null) {
-                Vector speed = output.speed();
-                speed = speed.length() > MAX_ROBOT_SPEED
-                        ? speed.normalize().multiplyWith(MAX_ROBOT_SPEED)
-                        : speed;
-                robot.setSpeed(speed);
+                robot.setSpeed(coerceSpeed(output.speed()));
             }
         }
 
@@ -66,6 +62,33 @@ public class Engine {
                             .filter(r -> r != robot)
                             .map(Robot::getPosition)
                             .collect(Collectors.toList())));
+        }
+    }
+
+    private static Vector coerceSpeed(Vector speed) {
+        double x = speed.x();
+        double y = speed.y();
+        if (x < -MAX_ROBOT_SPEED) {
+            x = -MAX_ROBOT_SPEED;
+        } else if (x > MAX_ROBOT_SPEED) {
+            x = MAX_ROBOT_SPEED;
+        }
+        if (y < -MAX_ROBOT_SPEED) {
+            y = -MAX_ROBOT_SPEED;
+        } else if (y > MAX_ROBOT_SPEED) {
+            y = MAX_ROBOT_SPEED;
+        }
+        return new Vector(x / 30.0, y / 30.0);
+    }
+
+    @Override
+    public void close() {
+        for (final Robot robot : this.robots()) {
+            try {
+                robot.close();
+            } catch (Exception e) {
+                log.warn("error closing " + robot, e);
+            }
         }
     }
 }

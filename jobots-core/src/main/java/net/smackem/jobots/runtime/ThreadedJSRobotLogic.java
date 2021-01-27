@@ -10,16 +10,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class JSRobotLogic implements RobotLogic, AutoCloseable {
+public class ThreadedJSRobotLogic implements RobotLogic, AutoCloseable {
 
     private static final String lang = "js";
-    private static final Logger log = LoggerFactory.getLogger(JSRobotLogic.class);
+    private static final Logger log = LoggerFactory.getLogger(ThreadedJSRobotLogic.class);
     private final String source;
     private final Thread thread;
     private final LogicBus bus;
     private volatile boolean acceptingInput;
 
-    public JSRobotLogic(String source, String sourceName) {
+    public ThreadedJSRobotLogic(String source, String sourceName) {
         this.source = source;
         this.bus = new LogicBus();
         this.thread = new Thread(this::run, sourceName + "-thread");

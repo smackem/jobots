@@ -2,23 +2,22 @@ package net.smackem.jobots.runtime;
 
 import java.util.Objects;
 
-public class Robot {
+public class Robot implements AutoCloseable {
 
+    private static final double acceleration = 5;
     private final RobotLogic logic;
-    private final double acceleration;
     private final int colorArgb;
     private Vector position = Vector.ORIGIN;
     private Vector speed = Vector.ORIGIN;
     private Vector actualSpeed = Vector.ORIGIN;
 
-    public Robot(double acceleration, RobotLogic logic, int colorArgb) {
-        this.acceleration = acceleration;
+    public Robot(RobotLogic logic, int colorArgb) {
         this.logic = Objects.requireNonNull(logic);
         this.colorArgb = colorArgb;
     }
 
     public double acceleration() {
-        return this.acceleration;
+        return acceleration;
     }
 
     public RobotLogic logic() {
@@ -51,5 +50,12 @@ public class Robot {
 
     public void setActualSpeed(Vector value) {
         this.actualSpeed = Objects.requireNonNull(value);
+    }
+
+    @Override
+    public void close() throws Exception {
+        if (this.logic instanceof AutoCloseable) {
+            ((AutoCloseable) this.logic).close();
+        }
     }
 }
