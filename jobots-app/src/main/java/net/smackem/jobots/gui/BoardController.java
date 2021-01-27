@@ -36,7 +36,7 @@ public class BoardController {
         final Collection<Robot> robots = createRandomRobots(10);
         final String source = readSourceFromResource("/net/smackem/jobots/runtime/flock.js");
         for (int i = 0; i < 50; i++) {
-            robots.add(new Robot(new ThreadedJSRobotLogic(source, "flock" + i), colorToArgb(Color.RED)));
+            robots.add(new Robot(new ThreadedJSRobotLogic(source, "flock-" + i), colorToArgb(Color.RED)));
         }
         positionRobots(robots);
         this.engine = new Engine(new Vector(BOARD_WIDTH, BOARD_HEIGHT), robots);

@@ -1,4 +1,5 @@
 const prefDistance = 120;
+const minDistanceFromWall = 50;
 
 function vectorStr(v) {
     return v.x() + ";" + v.y();
@@ -32,6 +33,16 @@ while (input = bus.poll()) {
                 .normalize()
                 .multiplyWith(prefDistance - nearest.distance);
         }
+    }
+    if (position.x() < minDistanceFromWall / 2) {
+        speed = new Vector(minDistanceFromWall - position.x(), 0);
+    } else if (position.x() > input.boardDimensions().x() - minDistanceFromWall / 2) {
+        speed = new Vector(-(minDistanceFromWall - (input.boardDimensions().x() - position.x())), 0);
+    }
+    if (position.y() < minDistanceFromWall / 2) {
+        speed = new Vector(0, minDistanceFromWall - position.y());
+    } else if (position.y() > input.boardDimensions().y() - minDistanceFromWall / 2) {
+        speed = new Vector(0, -(minDistanceFromWall - (input.boardDimensions().y() - position.y())));
     }
     if (speed != null) {
         log.debug("speed = {}", vectorStr(speed));

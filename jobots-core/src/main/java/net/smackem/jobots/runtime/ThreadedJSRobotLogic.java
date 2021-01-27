@@ -11,7 +11,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class ThreadedJSRobotLogic implements RobotLogic, AutoCloseable {
-
     private static final String lang = "js";
     private static final Logger log = LoggerFactory.getLogger(ThreadedJSRobotLogic.class);
     private final String source;
