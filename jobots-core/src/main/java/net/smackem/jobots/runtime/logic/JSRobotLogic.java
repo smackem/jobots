@@ -1,5 +1,7 @@
-package net.smackem.jobots.runtime;
+package net.smackem.jobots.runtime.logic;
 
+import net.smackem.jobots.runtime.RobotLogic;
+import net.smackem.jobots.runtime.Vector;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
@@ -11,9 +13,11 @@ public class JSRobotLogic implements RobotLogic, AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(ThreadedJSRobotLogic.class);
     private final Value jsFunc;
     private final Context context;
+    private final String sourceName;
     private Output output;
 
     public JSRobotLogic(String source, String sourceName) {
+        this.sourceName = sourceName;
         this.context = Context.newBuilder(lang)
                 .allowHostAccess(HostAccess.ALL)
                 .allowHostClassLookup(className -> className.startsWith("net.smackem.jobots"))
@@ -25,6 +29,11 @@ public class JSRobotLogic implements RobotLogic, AutoCloseable {
         bindings.putMember("Vector", vectorType);
         bindings.putMember("log", log);
         this.jsFunc = context.parse(lang, source);
+    }
+
+    @Override
+    public String logicId() {
+        return this.sourceName;
     }
 
     @Override

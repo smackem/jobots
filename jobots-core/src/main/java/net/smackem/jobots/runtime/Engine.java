@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class Engine implements AutoCloseable {
     private static final Logger log = LoggerFactory.getLogger(Engine.class);
-    private static final double MAX_ROBOT_SPEED = 300;
+    private static final double MAX_ROBOT_SPEED = 100;
     private final Vector boardDimensions;
     private final Collection<Robot> robots;
 
@@ -60,7 +60,7 @@ public class Engine implements AutoCloseable {
                     this.boardDimensions,
                     this.robots.stream()
                             .filter(r -> r != robot)
-                            .map(Robot::getPosition)
+                            .map(r -> new RobotLogic.DetectedRobot(r.logic().logicId(), r.getPosition()))
                             .collect(Collectors.toList())));
         }
     }

@@ -9,10 +9,10 @@ let input;
 while (input = bus.poll()) {
     let position = input.position();
     let others = [];
-    for (let otherPos of input.neighbours()) {
+    for (let other of input.neighbours()) {
         others.push({
-            "distance": Vector.distance(otherPos, position),
-            "position": otherPos
+            "distance": Vector.distance(other.position(), position),
+            "position": other.position()
         });
     }
     others.sort(function(a, b) {

@@ -12,12 +12,17 @@ import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import net.smackem.jobots.gui.util.Argb;
 import net.smackem.jobots.runtime.*;
+import net.smackem.jobots.runtime.logic.FlockingRobotLogic;
+import net.smackem.jobots.runtime.logic.RandomRobotLogic;
+import net.smackem.jobots.runtime.logic.ThreadedJSRobotLogic;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -33,10 +38,9 @@ public class BoardController {
     public BoardController() {
         this.timer = new Timeline(new KeyFrame(Duration.millis(50), this::tick));
         this.timer.setCycleCount(Animation.INDEFINITE);
-        final Collection<Robot> robots = createRandomRobots(10);
-        final String source = readSourceFromResource("/net/smackem/jobots/runtime/flock.js");
+        final Collection<Robot> robots = createRandomRobots(1);
         for (int i = 0; i < 50; i++) {
-            robots.add(new Robot(new ThreadedJSRobotLogic(source, "flock-" + i), colorToArgb(Color.RED)));
+            robots.add(new Robot(new FlockingRobotLogic(), Argb.fromColor(Color.BLUE)));
         }
         positionRobots(robots);
         this.engine = new Engine(new Vector(BOARD_WIDTH, BOARD_HEIGHT), robots);
@@ -55,16 +59,6 @@ public class BoardController {
         });
     }
 
-    private String readSourceFromResource(String resource) {
-        final InputStream is = getClass().getResourceAsStream(resource);
-        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            return reader.lines().collect(Collectors.joining());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     private void onWindowClosing(WindowEvent windowEvent) {
         this.engine.close();
     }
@@ -76,7 +70,7 @@ public class BoardController {
         gc.fillRect(0, 0, dimensions.x(), dimensions.y());
         for (final Robot robot : this.engine.robots()) {
             final Vector position = robot.getPosition();
-            gc.setFill(argbToColor(robot.colorArgb()));
+            gc.setFill(Argb.toColor(robot.colorArgb()));
             gc.fillOval(position.x() - 5, position.y() - 5, 10, 10);
         }
     }
@@ -103,9 +97,29 @@ public class BoardController {
         return IntStream.range(0, count)
                 .mapToObj(ignored -> {
                     final Color color = robotPaints.get(random.nextInt(0, robotPaints.size()));
-                    return new Robot(new RandomRobotLogic(), colorToArgb(color));
+                    return new Robot(new RandomRobotLogic(), Argb.fromColor(color));
                 })
                 .collect(Collectors.toList());
+    }
+
+    private static Collection<Robot> createJSRobots(int count, String scriptName) {
+        final String source = readSourceFromResource("/net/smackem/jobots/runtime/logic/" + scriptName);
+        final Collection<Robot> robots = new ArrayList<>();
+        final int argb = Argb.fromColor(Color.RED);
+        for (int i = 0; i < 80; i++) {
+            robots.add(new Robot(new ThreadedJSRobotLogic(source, scriptName), argb));
+        }
+        return robots;
+    }
+
+    private static String readSourceFromResource(String resource) {
+        final InputStream is = BoardController.class.getResourceAsStream(resource);
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            return reader.lines().collect(Collectors.joining());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static void positionRobots(Collection<Robot> robots) {
@@ -113,20 +127,5 @@ public class BoardController {
         for (final Robot r : robots) {
             r.setPosition(new Vector(random.nextInt(BOARD_WIDTH), random.nextDouble(BOARD_HEIGHT)));
         }
-    }
-
-    private static int colorToArgb(Color color) {
-        return ((int) (color.getOpacity() * 255) << 24) |
-                ((int) (color.getRed() * 255) << 16) |
-                ((int) (color.getGreen() * 255) << 8) |
-                ((int) (color.getBlue() * 255));
-    }
-
-    private static Color argbToColor(int colorArgb) {
-        return Color.rgb(
-                colorArgb >> 16 & 255,
-                colorArgb >> 8 & 255,
-                colorArgb & 255,
-                (colorArgb >> 24 & 255) / 255.0);
     }
 }

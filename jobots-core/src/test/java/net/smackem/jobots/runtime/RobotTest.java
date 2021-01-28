@@ -21,7 +21,9 @@ public class RobotTest {
         bindings.putMember("input", new RobotLogic.Input(
                 new Vector(100, 200),
                 new Vector(1000, 800),
-                List.of(new Vector(20, 10), new Vector(400, 30))));
+                List.of(
+                        new RobotLogic.DetectedRobot("test", new Vector(20, 10)),
+                        new RobotLogic.DetectedRobot("test", new Vector(400, 30)))));
         bindings.putMember("Output", Value.asValue(RobotLogic.Output.class));
         bindings.putMember("Vector", Value.asValue(Vector.class));
         try (context) {

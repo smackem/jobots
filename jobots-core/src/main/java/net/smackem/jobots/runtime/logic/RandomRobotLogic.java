@@ -1,5 +1,7 @@
-package net.smackem.jobots.runtime;
+package net.smackem.jobots.runtime.logic;
 
+import net.smackem.jobots.runtime.RobotLogic;
+import net.smackem.jobots.runtime.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +11,11 @@ public class RandomRobotLogic implements RobotLogic {
     private static final Logger log = LoggerFactory.getLogger(RandomRobotLogic.class);
     private Vector destination;
     private Vector position;
+
+    @Override
+    public String logicId() {
+        return "random";
+    }
 
     @Override
     public void offerInput(Input input) {

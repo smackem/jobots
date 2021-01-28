@@ -1,5 +1,7 @@
-package net.smackem.jobots.runtime;
+package net.smackem.jobots.runtime.logic;
 
+import net.smackem.jobots.runtime.RobotLogic;
+import net.smackem.jobots.runtime.Vector;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
@@ -13,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class ThreadedJSRobotLogic implements RobotLogic, AutoCloseable {
     private static final String lang = "js";
     private static final Logger log = LoggerFactory.getLogger(ThreadedJSRobotLogic.class);
+    private final String sourceName;
     private final String source;
     private final Thread thread;
     private final LogicBus bus;
@@ -20,6 +23,7 @@ public class ThreadedJSRobotLogic implements RobotLogic, AutoCloseable {
 
     public ThreadedJSRobotLogic(String source, String sourceName) {
         this.source = source;
+        this.sourceName = sourceName;
         this.bus = new LogicBus();
         this.thread = new Thread(this::run, sourceName + "-thread");
         this.thread.start();
@@ -45,6 +49,11 @@ public class ThreadedJSRobotLogic implements RobotLogic, AutoCloseable {
         } catch (Exception e) {
             log.info("JS execution broke with exception", e);
         }
+    }
+
+    @Override
+    public String logicId() {
+        return this.sourceName;
     }
 
     @Override
