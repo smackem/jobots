@@ -35,7 +35,7 @@ public class Engine implements AutoCloseable {
 
         for (final Robot robot : this.robots) {
             final Vector actualSpeed = robot.getActualSpeed();
-            robot.setPosition(robot.getPosition().add(actualSpeed));
+            robot.setPosition(robot.getPosition().plus(actualSpeed));
             final Vector speed = robot.getSpeed();
             if (speed.equals(actualSpeed)) {
                 continue;

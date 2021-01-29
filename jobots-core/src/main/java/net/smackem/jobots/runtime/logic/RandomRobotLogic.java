@@ -34,7 +34,7 @@ public class RandomRobotLogic implements RobotLogic {
         if (this.position == null) {
             return new Output(Vector.ORIGIN);
         }
-        final Vector speed = this.destination.subtract(this.position);
+        final Vector speed = this.destination.minus(this.position);
         return new Output(speed);
     }
 }

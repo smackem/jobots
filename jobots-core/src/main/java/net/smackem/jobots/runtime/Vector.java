@@ -30,20 +30,20 @@ public class Vector {
         return new Vector(-this.x, -this.y);
     }
 
-    public Vector add(Vector right) {
+    public Vector plus(Vector right) {
         return new Vector(this.x + right.x, this.y + right.y);
     }
 
-    public Vector subtract(Vector right) {
+    public Vector minus(Vector right) {
         return new Vector(this.x - right.x, this.y - right.y);
     }
 
-    public Vector multiplyWith(double scalar) {
+    public Vector scale(double scalar) {
         return new Vector(this.x * scalar, this.y * scalar);
     }
 
-    public Vector divideBy(double scalar) {
-        return new Vector(this.x / scalar, this.y / scalar);
+    public double distanceTo(Vector right) {
+        return Vector.distance(this, right);
     }
 
     public static double distance(Vector a, Vector b) {
